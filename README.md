@@ -1,8 +1,9 @@
-# MLIR Tutorial
+# PR3 - 编写我们的第一个Pass
 
-This is the code repository for a series of articles
-on the MLIR framework.
+这是我复现第三篇博客的学习分支。
 
-1. Build System (Getting Started) TODO: write the article and add links
-2. A First Lowering, and Testing Basics
-
+**今日进度 (2025-09-18):**
+- 成功搭建了本地和远程学习仓库。
+- 掌握了Git分支、提交和推送的基本流程。
+- 搭建好了项目的Bazel骨架，并开始下载依赖。
+- 创建了`tools/tutorial-opt.cpp`的空壳。
