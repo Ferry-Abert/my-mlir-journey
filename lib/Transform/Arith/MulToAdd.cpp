@@ -21,7 +21,6 @@ struct PowerOfTwoExpand :
   LogicalResult matchAndRewrite(MulIOp op,
                                 PatternRewriter &rewriter) const override {
     Value lhs = op.getOperand(0);
-`
     // canonicalization patterns ensure the constant is on the right, if there is a constant
     // See https://mlir.llvm.org/docs/Canonicalization/#globally-applied-rules
     Value rhs = op.getOperand(1);
