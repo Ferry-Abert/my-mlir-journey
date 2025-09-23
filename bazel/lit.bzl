@@ -49,7 +49,7 @@ def lit_test(name = None, src = None, size = "small", tags = None):
         size = size,
         # -v ensures lit outputs useful info during test failures
         args = ["-v", paths.join(native.package_name(), src)],
-        data = ["@mlir_tutorial//tests:test_utilities", filegroup_name],
+        data = ["@my_mlir_journey//tests:test_utilities", filegroup_name],
         srcs = ["@llvm-project//llvm:lit"],
         main = "lit.py",
         tags = tags,
