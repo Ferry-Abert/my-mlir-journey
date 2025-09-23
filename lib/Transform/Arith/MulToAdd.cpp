@@ -16,7 +16,7 @@ using arith::MulIOp;
 struct PowerOfTwoExpand :
   public OpRewritePattern<MulIOp> {
   PowerOfTwoExpand(mlir::MLIRContext *context)
-      : OpRewritePattern<MulIOp>(context, /*benefit=*/2) {}
+      : OpRewritePattern<MulIOp>(context, /*benefit=*/1) {}
 
   LogicalResult matchAndRewrite(MulIOp op,
                                 PatternRewriter &rewriter) const override {
@@ -52,7 +52,7 @@ struct PowerOfTwoExpand :
 struct PeelFromMul :
   public OpRewritePattern<MulIOp> {
   PeelFromMul(mlir::MLIRContext *context)
-      : OpRewritePattern<MulIOp>(context, /*benefit=*/1) {}
+      : OpRewritePattern<MulIOp>(context, /*benefit=*/2) {}
 
   LogicalResult matchAndRewrite(MulIOp op,
                                 PatternRewriter &rewriter) const override {
