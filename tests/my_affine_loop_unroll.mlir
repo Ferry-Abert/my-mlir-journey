@@ -7,7 +7,7 @@ func.func @my_affine(%buffer : memref<4xi32>)->(i32){
   %sum = affine.for %i= 0 to 4 iter_args(%sum_iter = %sum_0)->(i32){
     %t = affine.load %buffer[%i] : memref<4xi32>
     %sum_next = arith.addi %sum_iter, %t: i32
-    affine.yield %sum_next
+    affine.yield %sum_next : i32
   }
   func.return %sum : i32
 }
