@@ -1,5 +1,6 @@
 #include "lib/Transform/Arith/MulToAdd.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
+#include "mlir/Dialect/Math/IR/Math.h"
 #include "mlir/IR/PatternMatch.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
 #include "mlir/include/mlir/Pass/Pass.h"
@@ -10,13 +11,50 @@ namespace tutorial {
 using arith::AddIOp;
 using arith::ConstantOp;
 using arith::MulIOp;
+using math::CountTrailingZerosOp;
+using arith::ShLIOp;
+
+// Replace y = C*x with x << logC, when C is a power of 2, otherwise do
+// nothing.
+struct PowerOfTwoShli :
+  public OpRewritePattern<MulIOp> {
+  PowerOfTwoShli(mlir::MLIRContext *context)
+      : OpRewritePattern<MulIOp>(context, /*benefit=*/3) {}
+
+  LogicalResult matchAndRewrite(MulIOp op,
+                                PatternRewriter &rewriter) const override {
+    Value lhs = op.getOperand(0);
+    // canonicalization patterns ensure the constant is on the right, if there is a constant
+    // See https://mlir.llvm.org/docs/Canonicalization/#globally-applied-rules
+    Value rhs = op.getOperand(1);
+    auto rhsDefiningOp = rhs.getDefiningOp<arith::ConstantIntOp>();
+    if (!rhsDefiningOp) {
+      return failure();
+    }
+
+    int64_t value = rhsDefiningOp.value();
+    bool is_power_of_two = (value & (value - 1)) == 0;
+
+    if (!is_power_of_two) {
+      return failure();
+    }
+
+    Value shiftAmount = rewriter.create<CountTrailingZerosOp>(
+        op.getLoc(),rhs);   
+    ShLIOp newShiftOp = rewriter.create<arith::ShLIOp>(op.getLoc(), lhs, shiftAmount);
+    rewriter.replaceOp(op, {newShiftOp});
+    rewriter.eraseOp(rhsDefiningOp);
+
+    return success();
+  }
+};
 
 // Replace y = C*x with y = C/2*x + C/2*x, when C is a power of 2, otherwise do
 // nothing.
 struct PowerOfTwoExpand :
   public OpRewritePattern<MulIOp> {
   PowerOfTwoExpand(mlir::MLIRContext *context)
-      : OpRewritePattern<MulIOp>(context, /*benefit=*/1) {}
+      : OpRewritePattern<MulIOp>(context, /*benefit=*/2) {}
 
   LogicalResult matchAndRewrite(MulIOp op,
                                 PatternRewriter &rewriter) const override {
@@ -52,7 +90,7 @@ struct PowerOfTwoExpand :
 struct PeelFromMul :
   public OpRewritePattern<MulIOp> {
   PeelFromMul(mlir::MLIRContext *context)
-      : OpRewritePattern<MulIOp>(context, /*benefit=*/2) {}
+      : OpRewritePattern<MulIOp>(context, /*benefit=*/1) {}
 
   LogicalResult matchAndRewrite(MulIOp op,
                                 PatternRewriter &rewriter) const override {

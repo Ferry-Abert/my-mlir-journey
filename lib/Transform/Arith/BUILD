@@ -8,6 +8,7 @@ cc_library(
     hdrs = ["MulToAdd.h"],
     deps = [
         "@llvm-project//mlir:ArithDialect",
+        "@llvm-project//mlir:MathDialect",
         "@llvm-project//mlir:FuncDialect",
         "@llvm-project//mlir:Pass",
         "@llvm-project//mlir:Transforms",
