@@ -1,0 +1,8 @@
+# 忽略 Bazel 构建目录
+bazel-bin/
+bazel-out/
+bazel-testlogs/
+# 忽略 Bazel 依赖缓存
+external/
+# 忽略编译数据库
+compile_commands.json
